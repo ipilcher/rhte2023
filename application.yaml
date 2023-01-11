@@ -10,6 +10,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/ipilcher/rhte2023.git
+    path: app
     targetRevision: HEAD
   syncPolicy:
     automated: {}
