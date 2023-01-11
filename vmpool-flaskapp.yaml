@@ -1,0 +1,91 @@
+apiVersion: pool.kubevirt.io/v1alpha1
+kind: VirtualMachinePool
+metadata:
+  name: flaskapp-vmpool
+  namespace: rhte
+spec:
+  selector: {}
+  replicas: 2
+  virtualMachineTemplate:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+        vm.kubevirt.io/validations: |
+          [
+            {
+              "name": "minimal-required-memory",
+              "path": "jsonpath::.spec.domain.resources.requests.memory",
+              "rule": "integer",
+              "message": "This VM requires more memory.",
+              "min": 1610612736
+            }
+          ]
+      labels:
+        app: flaskapp
+        version: vm
+        vm.kubevirt.io/template: rhel8-server-small
+        vm.kubevirt.io/template.namespace: openshift
+        vm.kubevirt.io/template.revision: '1'
+        vm.kubevirt.io/template.version: v0.23.4
+    spec:
+      dataVolumeTemplates:
+        - apiVersion: cdi.kubevirt.io/v1beta1
+          kind: DataVolume
+          metadata:
+            name: rhel8-flaskapp-vm
+          spec:
+            source:
+              pvc:
+                name: rhel8-flaskapp
+                namespace: rhte
+            storage:
+              resources:
+                requests:
+                  storage: 11Gi
+      running: true
+      template:
+        metadata:
+          annotations:
+            vm.kubevirt.io/flavor: small
+            vm.kubevirt.io/os: rhel8
+            vm.kubevirt.io/workload: server
+          labels:
+            app: flaskapp
+            version: vm
+            kubevirt.io/size: small
+        spec:
+          domain:
+            cpu:
+              cores: 1
+              sockets: 1
+              threads: 1
+            devices:
+              disks:
+                - disk:
+                    bus: virtio
+                  name: rootdisk
+              interfaces:
+                - masquerade: {}
+                  name: default
+                - bridge: {}
+                  model: virtio
+                  name: eth1-vlan104
+              networkInterfaceMultiqueue: true
+              rng: {}
+            machine:
+              type: pc-q35-rhel8.6.0
+            resources:
+              requests:
+                memory: 2Gi
+          evictionStrategy: LiveMigrate
+          networks:
+            - name: default
+              pod: {}
+            - name: eth1-vlan104
+              multus:
+                networkName: rhte-vlan104
+          terminationGracePeriodSeconds: 180
+          volumes:
+            - dataVolume:
+                name: rhel8-flaskapp-vm
+              name: rootdisk
