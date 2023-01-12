@@ -83,7 +83,7 @@ spec:
               pod: {}
             - name: eth1-vlan104
               multus:
-                networkName: rhte-vlan104
+                networkName: vlan104
           terminationGracePeriodSeconds: 180
           volumes:
             - dataVolume:
