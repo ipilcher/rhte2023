@@ -1,2 +1,4 @@
 resources:
   - vmpool-flaskapp.yaml
+  - service.yaml
+  - route.yaml
