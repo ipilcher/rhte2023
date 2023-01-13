@@ -46,6 +46,7 @@ spec:
       template:
         metadata:
           annotations:
+            sidecar.istio.io/inject: 'true'
             vm.kubevirt.io/flavor: small
             vm.kubevirt.io/os: rhel8
             vm.kubevirt.io/workload: server
