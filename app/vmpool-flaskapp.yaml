@@ -9,7 +9,6 @@ spec:
   virtualMachineTemplate:
     metadata:
       annotations:
-        #sidecar.istio.io/inject: 'true'
         vm.kubevirt.io/validations: |
           [
             {
@@ -42,7 +41,7 @@ spec:
               resources:
                 requests:
                   storage: 11Gi
-      running: true
+      running: false
       template:
         metadata:
           annotations:
